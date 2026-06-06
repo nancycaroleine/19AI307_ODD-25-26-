@@ -1,120 +1,130 @@
-# Ex.No:4(E) DESIGN PATTERN ---- BEHAVIOUR PATTERN
+# Ex.No:4(E) DESIGN PATTERN  ---- BEHAVIOUR PATTERN
 
 ## QUESTION:
-Write a Java program to demonstrate a **Behavioral Design Pattern** using the **Observer Pattern**.
-
----
+Create an Article class where changes to the content are saved as mementos. Let the user view and restore any saved version.
 
 ## AIM:
-To write a Java program to demonstrate the **Observer Pattern**, where multiple objects are notified when a change occurs.
-
----
+To implement the Memento Design Pattern that allows saving and restoring versions of an Article object.
 
 ## ALGORITHM :
-1. Start the program.  
-2. Import the necessary package `java.util`.  
-3. Create an interface `Observer` with a method `update()`.  
-4. Create a class `Subscriber` that implements the `Observer` interface.  
-5. Define a variable `name` and override the `update()` method.  
-6. Create a class `Channel` (Subject).  
-7. Declare a list to store observers (subscribers).  
-8. Create a method `subscribe()` to add observers.  
-9. Create a method `notifySubscribers()` to notify all observers.  
-10. Create a method `uploadVideo()` to simulate a change and notify observers.  
-11. In the main class, create a `Channel` object.  
-12. Read subscriber details and add them to the channel.  
-13. Read video title and call `uploadVideo()`.  
-14. Display notifications for each subscriber.  
-15. Stop the program.
-
----
+1.	Create ArticleMemento to store article content (state).
+2.	Create Article (Originator) that can write, save, and restore content.
+3.	Create VersionHistory (Caretaker) to store multiple mementos.
+4.	Allow the user to:
+5.	Write new content
+6.	Save current version
+7.	View all saved versions
+8.	Restore any version
+9.	Display restored version content.
 
 ## PROGRAM:
-
-```
-
-Program to implement Behaviour Pattern using Java (Observer Pattern)
-Developed by: NANCY CAROLEINE P R 
+ ```
+Program to implement a Behaviour Pattern using Java
+Developed by: NANCY CAROLEINE P R
 RegisterNumber: 212223060181
 ```
+
 ## SOURCE CODE:
 ```
+
 import java.util.*;
 
-interface Observer {
-    void update(String channelName, String videoTitle);
+class Article {
+    private String content;
+
+    public Article(String content) {
+        this.content = content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    // Save current state to memento
+    public ArticleMemento save() {
+        return new ArticleMemento(content);
+    }
+
+    // Restore state from memento
+    public void restore(ArticleMemento memento) {
+        this.content = memento.getContent();
+    }
 }
 
-class Subscriber implements Observer {
-    private String name;
+class ArticleMemento {
+    private final String content;
 
-    public Subscriber(String name) {
-        this.name = name;
+    public ArticleMemento(String content) {
+        this.content = content;
     }
 
-    public void update(String channelName, String videoTitle) {
-        System.out.println(name + " received notification: " + channelName + " uploaded " + videoTitle);
+    public String getContent() {
+        return content;
     }
 }
 
-class Channel {
-    private String channelName;
-    private List<Observer> subscribers = new ArrayList<>();
+class ArticleHistory {
+    private List<ArticleMemento> versions = new ArrayList<>();
 
-    public Channel(String name) {
-        this.channelName = name;
+    public void saveVersion(Article article) {
+        versions.add(article.save());
     }
 
-    public void subscribe(Observer o) {
-        subscribers.add(o);
-    }
-
-    public void notifySubscribers(String videoTitle) {
-        for (Observer o : subscribers) {
-            o.update(channelName, videoTitle);
+    public ArticleMemento getVersion(int index) {
+        if (index >= 0 && index < versions.size()) {
+            return versions.get(index);
         }
+        return null;
     }
 
-    public void uploadVideo(String videoTitle) {
-        System.out.println(channelName + " uploaded: " + videoTitle);
-        notifySubscribers(videoTitle);
+    public List<ArticleMemento> getAllVersions() {
+        return versions;
     }
 }
 
-public class Main {
+public class ArticleManager {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
-        String channelName = sc.nextLine();
-        Channel channel = new Channel(channelName);
+        // Read number of versions
+        int n = Integer.parseInt(sc.nextLine());
+        ArticleHistory history = new ArticleHistory();
+        Article article = new Article("");
 
-        int n = sc.nextInt();
-        sc.nextLine();
-
+        // Read and save each version
         for (int i = 0; i < n; i++) {
-            String name = sc.nextLine();
-            channel.subscribe(new Subscriber(name));
+            String content = sc.nextLine();
+            article.setContent(content);
+            history.saveVersion(article);
         }
 
-        String videoTitle = sc.nextLine();
-        channel.uploadVideo(videoTitle);
+        // Read version index to restore (0-based)
+        int restoreIndex = Integer.parseInt(sc.nextLine());
+        ArticleMemento memento = history.getVersion(restoreIndex);
+        if (memento != null) {
+            article.restore(memento);
+            System.out.println(article.getContent());
+        } else {
+            System.out.println("Invalid version");
+        }
+
+        sc.close();
     }
 }
+
 ```
 
 ## OUTPUT:
+<img width="1240" height="593" alt="image" src="https://github.com/user-attachments/assets/1011ef9f-2030-4cf0-af05-89f76ddb4b89" />
 
-```
-TechWorld
-2
-Hari
-Priya
-Java Basics
-TechWorld uploaded: Java Basics
-Hari received notification: TechWorld uploaded Java Basics
-Priya received notification: TechWorld uploaded Java Basics
-```
+
 
 ## RESULT:
+The program successfully demonstrates the Memento Pattern, allowing the user to save, view, and restore different versions of an article.
 
-Thus, the Java program to demonstrate the **Behavioral Design Pattern (Observer Pattern)** was executed successfully and the output was verified.
+
+
